@@ -6,12 +6,6 @@ use std::sync::{Weak,Mutex};
 use std::thread;
 use rand;
 
-fn draw_circle(cairo : &Cairo, x : f64, y : f64, radius : f64){
-    cairo.set_line_width(radius / 10.0);
-    cairo.arc(x,y,radius,0.0,360.0);
-    cairo.stroke();
-}
-
 pub fn circle_fractals(circles : Weak<Mutex<Vec<Box<dyn Shape + Send>>>>, size : (f64,f64), start : f64, min : f64){
     {
         let circles = match circles.upgrade() {
@@ -313,7 +307,6 @@ fn random_tree_fractal_helper(shapes : Weak<Mutex<Vec<Box<dyn Shape + Send>>>>, 
             }
         }
     }
-    
 }
 
 fn in_angle(len : f64, angle : f64, from : (f64,f64)) -> (f64,f64){
