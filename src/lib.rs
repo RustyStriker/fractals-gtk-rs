@@ -295,21 +295,20 @@ fn random_tree_fractal_helper(shapes : Weak<Mutex<Vec<Box<dyn Shape + Send>>>>, 
         let to_4 = in_angle(len, -3.14 * angle_2 + angle, to);
         let to_5 = in_angle(len, 3.14 * angle_2 + angle, to);
 
-        for _ in 0..2{
-            let random = rand::random::<u8>() % 0b1111;
-            if random & 0b0001 != 0 {
-                random_tree_fractal_helper(shapes.clone(), to, to_1, branches - 1, size);
-            }
-            if random & 0b0010 != 0 {
-                random_tree_fractal_helper(shapes.clone(), to, to_2, branches - 1, size);
-            }
-            if random & 0b0100 != 0 {
-                random_tree_fractal_helper(shapes.clone(), to, to_4, branches - 1, size);
-            }
-            if random & 0b1000 != 0 {
-                random_tree_fractal_helper(shapes.clone(), to, to_5, branches - 1, size);
-            }
+        let random = rand::random::<u8>() % 0b1111;
+        if random & 0b0001 != 0 {
+            random_tree_fractal_helper(shapes.clone(), to, to_1, branches - 1, size);
         }
+        if random & 0b0010 != 0 {
+            random_tree_fractal_helper(shapes.clone(), to, to_2, branches - 1, size);
+        }
+        if random & 0b0100 != 0 {
+            random_tree_fractal_helper(shapes.clone(), to, to_4, branches - 1, size);
+        }
+        if random & 0b1000 != 0 {
+            random_tree_fractal_helper(shapes.clone(), to, to_5, branches - 1, size);
+        }
+        
     }
 }
 
