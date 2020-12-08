@@ -5,7 +5,9 @@ extern crate gdk;
 
 use gtk::prelude::*;
 use std::sync::{Arc,Mutex};
-use fractals::Shape;
+use std::cell::RefCell;
+use fractals::shapes::Shape;
+use fractals::*;
 
 fn main() {
     if gtk::init().is_err(){
@@ -33,6 +35,9 @@ fn main() {
     let type_picker : gtk::ComboBox = builder.get_object("type_picker").unwrap();
 
     let shapes_down = Arc::downgrade(&shapes);
+
+    let thread_handler = RefCell::new(ThreadHandle::new());
+
     refresh.connect_clicked(move |_| {
         let size = (drawing.get_allocated_width() as f64, drawing.get_allocated_height() as f64);
         
@@ -45,16 +50,36 @@ fn main() {
             Err(_) => 0.0
         };
 
-        match type_picker.get_active(){
-            Some(0) => fractals::circle_fractals(shapes_down.clone(), size,start, start / min),
-            Some(1) => fractals::lines_fractal(shapes_down.clone(), size, start, start / min),
-            Some(2) => fractals::line_circle_fractals(shapes_down.clone(), size, start, start / min),
-            Some(3) => fractals::tree_fractal(shapes_down.clone(), size, start, min as i32),
-            Some(4) => fractals::random_tree_fractal(shapes_down.clone(), size, start, min as i32),
-            _ => println!("NOT IMPLEMENTED")
+        let data: FractalInitData = FractalInitData::new(
+            shapes_down.clone(),
+            size,
+            start,
+            min
+        );
+
+        if thread_handler.borrow().is_thread_running(){
+            let thread = thread_handler.replace(ThreadHandle::new());
+            thread.kill();
+        }
+
+        let f_type = match type_picker.get_active(){
+            Some(0) => FractalType::Circles,
+            Some(1) => FractalType::Lines,
+            Some(2) => FractalType::CirclesWithLines,
+            Some(3) => FractalType::Tree,
+            Some(4) => FractalType::RandomTree,
+            _ =>{
+                    println!("NOT IMPLEMENTED");
+                    return;
+                }
         };
-        
-        drawing.queue_draw();
+
+        let new_handle = fractals::generate_fractal(f_type, data);
+        let prev_thread = thread_handler.replace(new_handle);
+
+        if prev_thread.is_thread_running(){
+            prev_thread.kill();
+        }
     });
     // draw the stuff
     da.connect_draw(move |_da, cairo| {
