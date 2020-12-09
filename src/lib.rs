@@ -42,6 +42,7 @@ pub fn generate_fractal(f_type : FractalType, data : FractalInitData) -> ThreadH
         FractalType::Circles => fractal::circles::circle_fractals(data, recv),
         FractalType::Lines => fractal::lines::lines_fractal(data, recv),
         FractalType::Tree => fractal::tree::tree_fractal(data),
+        FractalType::RandomTree => fractal::random_tree::random_tree_fractal(data),
         _ => None,
     };
     ThreadHandle{
